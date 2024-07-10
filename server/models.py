@@ -1,11 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+from sqlalchemy_serializer import SerializerMixin
 
 metadata = MetaData()
 
 db = SQLAlchemy(metadata=metadata)
 
-class Doctor(db.Model):
+class Doctor(db.Model, SerializerMixin):
     __tablename__ = 'Doctors'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -17,7 +18,7 @@ class Doctor(db.Model):
     def __repr__(self) -> str:
         return {self.name}
 
-class Department(db.Model):
+class Department(db.Model, SerializerMixin):
     __tablename__ = 'departments'
 
     id = db.Column(db.Integer, primary_key=True)
