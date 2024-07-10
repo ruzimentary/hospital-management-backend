@@ -10,7 +10,12 @@ with app.app_context():
         "Orthopedics", "Pediatrics", "Psychiatry", "Radiology", "Surgery"
     ]
 
+    departments_name = {"Cardiology Department","Dermatology Department","Endocrinology Department", "Gastroenterology Department", "Hematology Department", "Nephrology Department", "Neurology Department", "Oncology Department", "Ophthalmology Department", "Orthopedics Department", "Pediatrics Department", "Psychiatry Department", "Radiology Department", "Surgery Department"
+    }
+
     Doctor.query.delete()
+    Department.query.delete()
+
 
     doctors = []
     generated_emails = set()
@@ -32,5 +37,14 @@ with app.app_context():
         doctors.append(Doctor(name=name, speciality=speciality, email=email))
 
     db.session.add_all(doctors)
+    db.session.commit()
+
+    departments = []
+
+    for _ in range(10):
+        department_name = fake.random_element(elements=list(departments_name))
+        departments.append(Department(department_name=department_name))
+
+    db.session.add_all(departments)
     db.session.commit()
 
