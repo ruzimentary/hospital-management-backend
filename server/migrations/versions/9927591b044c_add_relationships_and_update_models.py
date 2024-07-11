@@ -1,8 +1,8 @@
 """Add relationships and update models
 
-Revision ID: cedea702a00a
+Revision ID: 9927591b044c
 Revises: 
-Create Date: 2024-07-11 21:12:41.150256
+Create Date: 2024-07-11 22:51:08.388418
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'cedea702a00a'
+revision = '9927591b044c'
 down_revision = None
 branch_labels = None
 depends_on = None

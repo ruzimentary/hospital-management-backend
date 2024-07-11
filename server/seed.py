@@ -58,7 +58,6 @@ with app.app_context():
         domain = fake.free_email_domain()
         email = f'{name.lower()}@{domain}'
 
-        # Ensure unique email
         while email in generated_emails:
             name = fake.first_name()
             domain = fake.free_email_domain()
@@ -116,12 +115,13 @@ with app.app_context():
 
     medicalrecords = []
 
+    import random
     patient_ids = [patient.id for patient in Patient.query.all()]
     medication_ids = [medication.id for medication in Medication.query.all()]
 
     for _ in range(100):
-        patient_id = fake.random_element(patient_ids)
-        medication_id = fake.random_element(medication_ids)
+        patient_id = random.choice(patient_ids)
+        medication_id = random.choice(medication_ids)
         diagnosis = fake.sentence(nb_words=6)
 
         medicalrecords.append(MedicalRecord(patient_id=patient_id, medication_id=medication_id, diagnosis=diagnosis))

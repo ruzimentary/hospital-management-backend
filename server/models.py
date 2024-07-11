@@ -20,6 +20,8 @@ class Doctor(db.Model, SerializerMixin):
     department = db.relationship('Department', back_populates='doctors')
     appointments = db.relationship('Appointment', back_populates='doctor')
 
+    serialize_rules = ('-appointments.doctor', '-department.doctors')
+
     def __repr__(self) -> str:
         return {self.name}
 
@@ -30,6 +32,8 @@ class Department(db.Model, SerializerMixin):
     department_name = db.Column(db.String(50), nullable=False)
 
     doctors = db.relationship('Doctor', back_populates='department')
+
+    serialize_rules = ('-doctors.department',)
 
     def __repr__(self) -> str:
         return {self.department_name}
@@ -46,6 +50,8 @@ class Patient(db.Model, SerializerMixin):
     appointments = db.relationship('Appointment', back_populates='patient')
     medical_records = db.relationship('MedicalRecord', back_populates='patient') 
 
+    serialize_rules = ('-appointments.patient', '-medical_records.patient')
+
     def __repr__(self) -> str:
         return {self.name}
     
@@ -60,6 +66,8 @@ class Appointment(db.Model, SerializerMixin):
     doctor = db.relationship('Doctor', back_populates='appointments')
     patient = db.relationship('Patient', back_populates='appointments') 
 
+    serialize_rules = ('-doctor.appointments', '-patient.appointments')
+
     def __repr__(self) -> str:
         return {self.appointment_date}
     
@@ -72,6 +80,8 @@ class Medication(db.Model, SerializerMixin):
 
     medical_records = db.relationship('MedicalRecord', back_populates='medication')
 
+    serialize_rules = ('-medical_records.medication',)
+
     def __repr__(self) -> str:
         return f"<Medication(name={self.medication_name}, dosage={self.dosage})>"
     
@@ -80,11 +90,13 @@ class MedicalRecord(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
-    medication_id = db.Column(db.Integer, db.ForeignKey('medications.id'), nullable=False)
+    medication_id = db.Column(db.Integer, db.ForeignKey('medications.id'))
     diagnosis = db.Column(db.String(200), nullable=False) 
 
     patient = db.relationship('Patient', back_populates='medical_records')  
     medication = db.relationship('Medication', back_populates='medical_records')  
+
+    serialize_rules = ('-patient.medical_records', '-medication.medical_records')
 
     def __repr__(self) -> str:
         return f'{self.dosage}'
