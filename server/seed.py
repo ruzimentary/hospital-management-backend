@@ -14,6 +14,8 @@ with app.app_context():
     departments_name = {"Cardiology Department","Dermatology Department","Endocrinology Department", "Gastroenterology Department", "Hematology Department", "Nephrology Department", "Neurology Department", "Oncology Department", "Ophthalmology Department", "Orthopedics Department", "Pediatrics Department", "Psychiatry Department", "Radiology Department", "Surgery Department"
     }
 
+    medications_name = {  "Amoxicillin", "Ibuprofen", "Lisinopril", "Metformin", "Simvastatin", "Omeprazole", "Levothyroxine", "Azithromycin", "Amlodipine", "Losartan", "Hydrochlorothiazide", "Atorvastatin", "Gabapentin", "Zolpidem", "Metoprolol", "Clopidogrel", "Montelukast", "Furosemide", "Pantoprazole", "Escitalopram", "Citalopram", "Sertraline", "Prednisone", "Tramadol", "Cyclobenzaprine", "Ciprofloxacin", "Doxycycline", "Meloxicam", "Oxycodone", "Hydroxychloroquine"}
+
     Doctor.query.delete()
     Department.query.delete()
     Patient.query.delete()
@@ -82,7 +84,7 @@ with app.app_context():
     medications = []
 
     for _ in range(30):
-        medication_name = fake.word()
+        medication_name = fake.random_element(elements=medications_name)
         dosage = f"{fake.random_int(min=1, max=500)} mg"
 
         medications.append(Medication(medication_name=medication_name, dosage=dosage))
@@ -95,7 +97,7 @@ with app.app_context():
     patient_ids = [patient.id for patient in Patient.query.all()]
     medication_ids = [medication.id for medication in Medication.query.all()]
 
-    for _ in range(1000):
+    for _ in range(100):
         patient_id = fake.random_element(patient_ids)
         medication_id = fake.random_element(medication_ids)
         dosage = f"{fake.random_int(min=1, max=500)} mg"
