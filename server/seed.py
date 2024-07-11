@@ -1,5 +1,5 @@
 from app import app
-from models import db, Doctor, Department, Patient, Appointment, Medicalrecords, Medication
+from models import db, Doctor, Department, Patient, Appointment, MedicalRecord, Medication
 from faker import Faker
 from datetime import date, datetime
 
@@ -16,35 +16,30 @@ with app.app_context():
 
     medications_name = {  "Amoxicillin", "Ibuprofen", "Lisinopril", "Metformin", "Simvastatin", "Omeprazole", "Levothyroxine", "Azithromycin", "Amlodipine", "Losartan", "Hydrochlorothiazide", "Atorvastatin", "Gabapentin", "Zolpidem", "Metoprolol", "Clopidogrel", "Montelukast", "Furosemide", "Pantoprazole", "Escitalopram", "Citalopram", "Sertraline", "Prednisone", "Tramadol", "Cyclobenzaprine", "Ciprofloxacin", "Doxycycline", "Meloxicam", "Oxycodone", "Hydroxychloroquine"}
 
+    specialty_department_map = {
+    "Cardiology": "Cardiology Department",
+    "Dermatology": "Dermatology Department",
+    "Endocrinology": "Endocrinology Department",
+    "Gastroenterology": "Gastroenterology Department",
+    "Hematology": "Hematology Department",
+    "Nephrology": "Nephrology Department",
+    "Neurology": "Neurology Department",
+    "Oncology": "Oncology Department",
+    "Ophthalmology": "Ophthalmology Department",
+    "Orthopedics": "Orthopedics Department",
+    "Pediatrics": "Pediatrics Department",
+    "Psychiatry": "Psychiatry Department",
+    "Radiology": "Radiology Department",
+    "Surgery": "Surgery Department"
+}
+
+
     Doctor.query.delete()
     Department.query.delete()
     Patient.query.delete()
     Appointment.query.delete()
-    Medicalrecords.query.delete()
+    MedicalRecord.query.delete()
     Medication.query.delete()
-
-
-    doctors = []
-    generated_emails = set()
-
-    for _ in range(50):
-        name = fake.first_name()
-        domain = fake.free_email_domain()
-        email = f'{name}@{domain}'
-
-        # Ensure unique email
-        while email in generated_emails:
-            name = fake.first_name()
-            domain = fake.free_email_domain()
-            email = f'{name}@{domain}'
-
-        generated_emails.add(email)
-        
-        speciality = fake.random_element(elements=specialties)
-        doctors.append(Doctor(name=name, speciality=speciality, email=email))
-
-    db.session.add_all(doctors)
-    db.session.commit()
 
     departments = []
 
@@ -54,6 +49,33 @@ with app.app_context():
 
     db.session.add_all(departments)
     db.session.commit()
+
+    doctors = []
+    generated_emails = set()
+
+    for _ in range(50):
+        name = fake.first_name()
+        domain = fake.free_email_domain()
+        email = f'{name.lower()}@{domain}'
+
+        # Ensure unique email
+        while email in generated_emails:
+            name = fake.first_name()
+            domain = fake.free_email_domain()
+            email = f'{name.lower()}@{domain}'
+
+        generated_emails.add(email)
+        
+        speciality = fake.random_element(elements=specialties)
+        department_name = specialty_department_map.get(speciality)
+        department = Department.query.filter_by(department_name=department_name).first()
+
+        new_doctor = Doctor(name=name, speciality=speciality, email=email, department=department)
+        db.session.add(new_doctor)
+        doctors.append(new_doctor)
+
+    db.session.commit()
+
 
     patients = []
 
@@ -72,11 +94,11 @@ with app.app_context():
     appointments = []
 
     for _ in range(200):
-        doctor_name = fake.name()
-        patient_name = fake.name()
+        doctor = fake.random_element(elements=doctors)
+        patient = fake.random_element(elements=patients)
         appointment_date = fake.date_between(start_date='-1y', end_date='+1y')
 
-        appointments.append(Appointment(doctor_name=doctor_name, patient_name=patient_name, appointment_date=appointment_date))
+        appointments.append(Appointment(doctor_id=doctor.id, patient_id=patient.id, appointment_date=appointment_date))
 
     db.session.add_all(appointments)
     db.session.commit()
@@ -100,9 +122,9 @@ with app.app_context():
     for _ in range(100):
         patient_id = fake.random_element(patient_ids)
         medication_id = fake.random_element(medication_ids)
-        dosage = f"{fake.random_int(min=1, max=500)} mg"
+        diagnosis = fake.sentence(nb_words=6)
 
-        medicalrecords.append(Medicalrecords(patient_id=patient_id, medication_id=medication_id, dosage=dosage))
+        medicalrecords.append(MedicalRecord(patient_id=patient_id, medication_id=medication_id, diagnosis=diagnosis))
 
     db.session.add_all(medicalrecords)
     db.session.commit()

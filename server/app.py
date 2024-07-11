@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from flask_migrate import Migrate
-from models import db, Doctor, Department, Patient, Appointment,  Medication, Medicalrecords
+from models import db, Doctor, Department, Patient, Appointment,  Medication, MedicalRecord
 
 app = Flask(__name__)
 
@@ -42,7 +42,7 @@ def get_all_medications():
 
 @app.route('/medicalrecords', methods=['GET'])
 def get_all_medicalrecords():
-    medications = Medicalrecords.query.all()
+    medications = MedicalRecord.query.all()
     return jsonify([medication.to_dict() for medication in medications])
 
 if __name__ == "__main__":

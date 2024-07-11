@@ -8,13 +8,17 @@ metadata = MetaData()
 db = SQLAlchemy(metadata=metadata)
 
 class Doctor(db.Model, SerializerMixin):
-    __tablename__ = 'Doctors'
+    __tablename__ = 'doctors'
+    
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     speciality = db.Column(db.String(50), nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey('departments.id'))
+
+    department = db.relationship('Department', back_populates='doctors')
+    appointments = db.relationship('Appointment', back_populates='doctor')
 
     def __repr__(self) -> str:
         return {self.name}
@@ -24,6 +28,8 @@ class Department(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     department_name = db.Column(db.String(50), nullable=False)
+
+    doctors = db.relationship('Doctor', back_populates='department')
 
     def __repr__(self) -> str:
         return {self.department_name}
@@ -37,6 +43,9 @@ class Patient(db.Model, SerializerMixin):
     gender = db.Column(db.String(50), nullable=False)
     date = db.Column(db.Date, default=datetime.now(timezone.utc))
 
+    appointments = db.relationship('Appointment', back_populates='patient')
+    medical_records = db.relationship('MedicalRecord', back_populates='patient') 
+
     def __repr__(self) -> str:
         return {self.name}
     
@@ -44,9 +53,12 @@ class Appointment(db.Model, SerializerMixin):
     __tablename__ = 'appointments'
 
     id = db.Column(db.Integer, primary_key=True)
-    doctor_name = db.Column(db.String(50), nullable=False)
-    patient_name = db.Column(db.String(50), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id')) 
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))  
     appointment_date = db.Column(db.Date, default=datetime.now(timezone.utc))
+
+    doctor = db.relationship('Doctor', back_populates='appointments')
+    patient = db.relationship('Patient', back_populates='appointments') 
 
     def __repr__(self) -> str:
         return {self.appointment_date}
@@ -58,16 +70,21 @@ class Medication(db.Model, SerializerMixin):
     medication_name = db.Column(db.String(50), nullable=False)
     dosage = db.Column(db.String(50), nullable=False)
 
+    medical_records = db.relationship('MedicalRecord', back_populates='medication')
+
     def __repr__(self) -> str:
         return f"<Medication(name={self.medication_name}, dosage={self.dosage})>"
     
-class Medicalrecords(db.Model, SerializerMixin):
+class MedicalRecord(db.Model, SerializerMixin):
     __tablename__ = 'medicalrecords'
 
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
-    medication_id = db.Column(db.Integer, db.ForeignKey('medications.id'))
-    dosage = db.Column(db.String(50), nullable=False)
+    medication_id = db.Column(db.Integer, db.ForeignKey('medications.id'), nullable=False)
+    diagnosis = db.Column(db.String(200), nullable=False) 
+
+    patient = db.relationship('Patient', back_populates='medical_records')  
+    medication = db.relationship('Medication', back_populates='medical_records')  
 
     def __repr__(self) -> str:
         return f'{self.dosage}'
