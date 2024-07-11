@@ -1,6 +1,7 @@
 from app import app
-from models import db, Doctor, Department
+from models import db, Doctor, Department, Patient
 from faker import Faker
+from datetime import date, datetime
 
 with app.app_context():
     fake = Faker()
@@ -15,12 +16,13 @@ with app.app_context():
 
     Doctor.query.delete()
     Department.query.delete()
+    Patient.query.delete()
 
 
     doctors = []
     generated_emails = set()
 
-    for _ in range(100):
+    for _ in range(50):
         name = fake.first_name()
         domain = fake.free_email_domain()
         email = f'{name}@{domain}'
@@ -47,4 +49,19 @@ with app.app_context():
 
     db.session.add_all(departments)
     db.session.commit()
+
+    patients = []
+
+    for _ in range(100):
+        name = fake.first_name()
+        birth_date = fake.date_of_birth(minimum_age=0, maximum_age=100)
+        age = date.today().year - birth_date.year
+        gender = fake.random_element(elements=('Male', 'Female'))
+        created_date = datetime.strptime(fake.date(), '%Y-%m-%d').date()
+
+        patients.append(Patient(name=name, age=age, gender=gender, date=created_date))
+
+    db.session.add_all(patients)
+    db.session.commit()
+
 
