@@ -39,3 +39,36 @@ class Patient(db.Model, SerializerMixin):
 
     def __repr__(self) -> str:
         return {self.name}
+    
+class Appointment(db.Model, SerializerMixin):
+    __tablename__ = 'appointments'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_name = db.Column(db.String(50), nullable=False)
+    patient_name = db.Column(db.String(50), nullable=False)
+    appointment_date = db.Column(db.Date, default=datetime.now(timezone.utc))
+
+    def __repr__(self) -> str:
+        return {self.appointment_date}
+    
+class Medication(db.Model, SerializerMixin):
+    __tablename__ = 'medications'
+
+    id = db.Column(db.Integer, primary_key=True)
+    medication_name = db.Column(db.String(50), nullable=False)
+    dosage = db.Column(db.String(50), nullable=False)
+
+    def __repr__(self) -> str:
+        return f"<Medication(name={self.medication_name}, dosage={self.dosage})>"
+    
+class Medicalrecords(db.Model, SerializerMixin):
+    __tablename__ = 'medicalrecords'
+
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
+    medication_id = db.Column(db.Integer, db.ForeignKey('medications.id'))
+    dosage = db.Column(db.String(50), nullable=False)
+
+    def __repr__(self) -> str:
+        return f'{self.dosage}'
+
