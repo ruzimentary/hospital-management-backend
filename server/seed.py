@@ -1,5 +1,5 @@
 from app import app
-from models import db, Doctor, Department, Patient
+from models import db, Doctor, Department, Patient, Appointment, Medicalrecords, Medication
 from faker import Faker
 from datetime import date, datetime
 
@@ -17,6 +17,9 @@ with app.app_context():
     Doctor.query.delete()
     Department.query.delete()
     Patient.query.delete()
+    Appointment.query.delete()
+    Medicalrecords.query.delete()
+    Medication.query.delete()
 
 
     doctors = []
@@ -64,4 +67,40 @@ with app.app_context():
     db.session.add_all(patients)
     db.session.commit()
 
+    appointments = []
 
+    for _ in range(200):
+        doctor_name = fake.name()
+        patient_name = fake.name()
+        appointment_date = fake.date_between(start_date='-1y', end_date='+1y')
+
+        appointments.append(Appointment(doctor_name=doctor_name, patient_name=patient_name, appointment_date=appointment_date))
+
+    db.session.add_all(appointments)
+    db.session.commit()
+
+    medications = []
+
+    for _ in range(30):
+        medication_name = fake.word()
+        dosage = f"{fake.random_int(min=1, max=500)} mg"
+
+        medications.append(Medication(medication_name=medication_name, dosage=dosage))
+
+    db.session.add_all(medications)
+    db.session.commit()
+
+    medicalrecords = []
+
+    patient_ids = [patient.id for patient in Patient.query.all()]
+    medication_ids = [medication.id for medication in Medication.query.all()]
+
+    for _ in range(1000):
+        patient_id = fake.random_element(patient_ids)
+        medication_id = fake.random_element(medication_ids)
+        dosage = f"{fake.random_int(min=1, max=500)} mg"
+
+        medicalrecords.append(Medicalrecords(patient_id=patient_id, medication_id=medication_id, dosage=dosage))
+
+    db.session.add_all(medicalrecords)
+    db.session.commit()
