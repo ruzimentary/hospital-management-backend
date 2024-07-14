@@ -12,6 +12,7 @@ faker = "*"
 sqlalchemy = "*"
 sqlalchemy-serializer = "*"
 flask-restful = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
